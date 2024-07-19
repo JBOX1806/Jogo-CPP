@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Jurídico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 600px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .question {
+            font-size: 20px;
+        }
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #result, #feedback {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Desafio Jurídico</h1>
+        <div id="quiz">
+            <p class="question" id="question"></p>
+            <ul class="options">
+                <li><button onclick="checkAnswer(0)" id="option0"></button></li>
+                <li><button onclick="checkAnswer(1)" id="option1"></button></li>
+                <li><button onclick="checkAnswer(2)" id="option2"></button></li>
+                <li><button onclick="checkAnswer(3)" id="option3"></button></li>
+            </ul>
+            <p id="feedback"></p>
+        </div>
+        <div id="result">
+            <p>Sua pontuação: <span id="score"></span></p>
+            <button onclick="startQuiz()">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Segundo o Art. 155 do CPP, em que circunstâncias o juiz pode fundamentar sua decisão exclusivamente nos elementos informativos colhidos na investigação?",
+                options: [
+                    "Em qualquer caso.",
+                    "Quando as provas são cautelares, não repetíveis e antecipadas.",
+                    "Apenas em casos de crimes contra a vida.",
+                    "Nunca."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 156, a prova da alegação incumbirá a quem?",
+                options: [
+                    "Ao juiz de ofício.",
+                    "Ao Ministério Público.",
+                    "A quem a fizer.",
+                    "Ao acusado."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "Segundo o Art. 157, as provas ilícitas devem ser:",
+                options: [
+                    "Admitidas com ressalvas.",
+                    "Desentranhadas do processo.",
+                    "Utilizadas apenas em casos urgentes.",
+                    "Mantidas no processo para análise."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 158, o exame de corpo de delito é indispensável quando:",
+                options: [
+                    "O acusado confessa o crime.",
+                    "A infração deixa vestígios.",
+                    "A testemunha corrobora a infração.",
+                    "O juiz determina."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 158-A, cadeia de custódia é:",
+                options: [
+                    "O conjunto de provas testemunhais.",
+                    "A história cronológica do vestígio coletado.",
+                    "A sequência de interrogatórios.",
+                    "O registro de audiência judicial."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Conforme o Art. 186, o acusado tem direito de:",
+                options: [
+                    "Ser interrogado com antecedência.",
+                    "Permanecer calado.",
+                    "Escolher o juiz do caso.",
+                    "Depor por escrito."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 201, o ofendido será:",
+                options: [
+                    "Qualificado e perguntado sobre as circunstâncias da infração.",
+                    "Impedido de depor.",
+                    "O último a ser ouvido.",
+                    "Sempre conduzido à presença da autoridade."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "Segundo o Art. 204, o depoimento da testemunha será:",
+                options: [
+                    "Prestado por escrito.",
+                    "Prestado oralmente.",
+                    "Enviado por e-mail.",
+                    "Gravado em áudio."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 212, as perguntas às testemunhas serão formuladas:",
+                options: [
+                    "Pelo juiz apenas.",
+                    "Pelas partes diretamente.",
+                    "Pelo Ministério Público apenas.",
+                    "Pelo advogado de defesa apenas."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 239, considera-se indício:",
+                options: [
+                    "A confissão do acusado.",
+                    "A prova testemunhal.",
+                    "A circunstância conhecida e provada.",
+                    "A decisão do juiz."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "Segundo o Art. 158-C, a coleta de vestígios deve ser realizada preferencialmente por:",
+                options: [
+                    "Um agente de polícia.",
+                    "Um delegado.",
+                    "Um perito oficial.",
+                    "Um investigador."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "De acordo com o Art. 158-D, todos os recipientes para acondicionamento de vestígios devem ser:",
+                options: [
+                    "Transparentes.",
+                    "Selados com lacres.",
+                    "Metálicos.",
+                    "Opacos."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 159, o exame de corpo de delito será realizado por:",
+                options: [
+                    "Um policial.",
+                    "Uma testemunha.",
+                    "Um perito oficial.",
+                    "Um juiz."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "De acordo com o Art. 161, o exame de corpo de delito pode ser feito:",
+                options: [
+                    "Apenas em dias úteis.",
+                    "A qualquer dia e hora.",
+                    "Apenas durante o dia.",
+                    "Apenas em horários comerciais."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 164, os cadáveres serão sempre:",
+                options: [
+                    "Movidos antes da perícia.",
+                    "Fotografados na posição em que foram encontrados.",
+                    "Autopsiados no local do crime.",
+                    "Examinados por testemunhas."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 167, quando não for possível realizar o exame de corpo de delito, a falta pode ser suprida por:",
+                options: [
+                    "Confissão do acusado.",
+                    "Prova testemunhal.",
+                    "Prova documental.",
+                    "Decisão judicial."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Conforme o Art. 196, o juiz pode proceder a novo interrogatório do acusado:",
+                options: [
+                    "Apenas uma vez.",
+                    "A qualquer momento.",
+                    "Somente a pedido da defesa.",
+                    "Somente durante o julgamento."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 201, se o ofendido deixar de comparecer sem motivo justo após ser intimado, ele pode ser:",
+                options: [
+                    "Preso.",
+                    "Conduzido à presença da autoridade.",
+                    "Multado.",
+                    "Processado."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 204, é permitido à testemunha trazer seu depoimento por escrito?",
+                options: [
+                    "Sim, sempre.",
+                    "Não, nunca.",
+                    "Sim, em casos especiais.",
+                    "Sim, se autorizado pelo juiz."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 206, quem pode recusar-se a depor?",
+                options: [
+                    "Qualquer pessoa.",
+                    "Apenas testemunhas doentes.",
+                    "Ascendentes ou descendentes do acusado.",
+                    "Qualquer pessoa menor de idade."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "De acordo com o Art. 209, o juiz pode ouvir outras testemunhas além das indicadas pelas partes:",
+                options: [
+                    "Apenas com autorização do Ministério Público.",
+                    "Somente com consentimento da defesa.",
+                    "Quando julgar necessário.",
+                    "Nunca."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "Segundo o Art. 226, quem tiver de fazer o reconhecimento de pessoa será convidado a:",
+                options: [
+                    "Descrever a pessoa a ser reconhecida.",
+                    "Identificar a pessoa por fotografia.",
+                    "Assinar um termo de reconhecimento.",
+                    "Escrever um relato do crime."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "De acordo com o Art. 230, o documento, quando original, pode ser exibido em audiência?",
+                options: [
+                    "Sim.",
+                    "Não.",
+                    "Sim, mas com autorização prévia.",
+                    "Apenas em casos excepcionais."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "Conforme o Art. 234, os documentos originais devem ser entregues à:",
+                options: [
+                    "Parte adversa.",
+                    "Autoridade policial.",
+                    "Parte interessada.",
+                    "Juiz."
+                ],
+                correctAnswer: 3
+            },
+            {
+                question: "Segundo o Art. 239, indício é a circunstância conhecida e provada que, tendo relação com:",
+                options: [
+                    "O crime, autorize concluir-se a existência de outra ou outras circunstâncias.",
+                    "A investigação, possa ser considerada prova.",
+                    "A defesa, fortaleça os argumentos da parte.",
+                    "A acusação, corrobore as alegações."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "De acordo com o Art. 241, consideram-se instrumentos do crime:",
+                options: [
+                    "Apenas as armas utilizadas.",
+                    "Os objetos que serviram à prática do crime.",
+                    "Os documentos falsificados.",
+                    "Os veículos utilizados na fuga."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 244, a busca será domiciliar ou pessoal. A busca pessoal pode ser realizada sem mandado em caso de:",
+                options: [
+                    "Fundada suspeita.",
+                    "Denúncia anônima.",
+                    "Ordem superior.",
+                    "Solicitação da vítima."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "De acordo com o Art. 245, ao realizar a busca domiciliar, a autoridade deve:",
+                options: [
+                    "Entrar imediatamente.",
+                    "Respeitar a integridade física e moral das pessoas.",
+                    "Quebrar objetos que atrapalhem a busca.",
+                    "Manter silêncio absoluto."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 255, o juiz pode acarear as testemunhas:",
+                options: [
+                    "Sempre que necessário para a busca da verdade.",
+                    "Apenas uma vez durante o processo.",
+                    "Somente se houver contradição evidente.",
+                    "Em qualquer situação."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "De acordo com o Art. 260, se o acusado não atender à intimação para interrogatório, reconhecimento ou qualquer outro ato, a autoridade poderá:",
+                options: [
+                    "Solicitar a presença de um advogado.",
+                    "Proceder à condução coercitiva do acusado.",
+                    "Adiar o ato indefinidamente.",
+                    "Encerrar o processo."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 262, o processo ficará suspenso quando:",
+                options: [
+                    "O acusado estiver preso.",
+                    "O réu não for encontrado para citação pessoal.",
+                    "A defesa solicitar mais tempo para preparação.",
+                    "O juiz assim decidir."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 282, as medidas cautelares serão aplicadas pelo juiz a requerimento de:",
+                options: [
+                    "Qualquer cidadão.",
+                    "Do Ministério Público ou do ofendido.",
+                    "Apenas da defesa.",
+                    "Somente da autoridade policial."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 283, ninguém poderá ser preso senão em flagrante delito ou por ordem escrita e fundamentada de:",
+                options: [
+                    "Qualquer autoridade.",
+                    "Um juiz competente.",
+                    "Um delegado de polícia.",
+                    "Um oficial de justiça."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 289, a prisão preventiva pode ser decretada:",
+                options: [
+                    "Apenas pelo Ministério Público.",
+                    "Pelo juiz, de ofício ou a requerimento das partes.",
+                    "Pela autoridade policial.",
+                    "Pela vítima."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 306, o preso em flagrante será informado de seus direitos, entre os quais o de:",
+                options: [
+                    "Permanecer calado.",
+                    "Receber visitas íntimas.",
+                    "Pedir perdão judicial.",
+                    "Escolher o juiz que julgará o caso."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "De acordo com o Art. 310, ao receber o auto de prisão em flagrante, o juiz deverá promover audiência de custódia no prazo de:",
+                options: [
+                    "48 horas.",
+                    "24 horas.",
+                    "72 horas.",
+                    "5 dias."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 312, a prisão preventiva poderá ser decretada como garantia da ordem pública, da ordem econômica, por conveniência da instrução criminal, ou para assegurar:",
+                options: [
+                    "A aplicação da lei civil.",
+                    "A aplicação da medida de segurança.",
+                    "A aplicação da lei penal.",
+                    "A aplicação de sanções administrativas."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "De acordo com o Art. 319, o juiz poderá substituir a prisão preventiva por outras medidas cautelares, como:",
+                options: [
+                    "Internação compulsória.",
+                    "Liberdade provisória com ou sem fiança.",
+                    "Pena de multa.",
+                    "Advertência verbal."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 320, a proibição de ausentar-se da comarca sem autorização judicial é uma medida:",
+                options: [
+                    "Punitiva.",
+                    "Cautelar.",
+                    "Administrativa.",
+                    "Civil."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "De acordo com o Art. 321, a liberdade provisória será concedida, sem fiança, quando:",
+                options: [
+                    "O réu for reincidente.",
+                    "Não estiverem presentes os requisitos que autorizam a prisão preventiva.",
+                    "O réu confessar o crime.",
+                    "Houver dúvida sobre a autoria."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 322, a autoridade policial somente poderá conceder fiança nos casos de infração cuja pena privativa de liberdade máxima não seja superior a:",
+                options: [
+                    "2 anos.",
+                    "3 anos.",
+                    "4 anos.",
+                    "5 anos."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "De acordo com o Art. 339, a citação inicial ocorrerá mediante:",
+                options: [
+                    "Carta precatória.",
+                    "Mandado.",
+                    "Edital.",
+                    "Ofício."
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Segundo o Art. 400, a audiência de instrução será realizada no prazo máximo de:",
+                options: [
+                    "30 dias.",
+                    "45 dias.",
+                    "60 dias.",
+                    "90 dias."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "De acordo com o Art. 403, após a inquirição das testemunhas e a realização das diligências, será concedida às partes a palavra para alegações finais, por:",
+                options: [
+                    "5 minutos.",
+                    "10 minutos.",
+                    "15 minutos.",
+                    "20 minutos."
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "Segundo o Art. 408, o juiz, ao pronunciar o réu, indicará:",
+                options: [
+                    "O nome da vítima.",
+                    "Os motivos da decisão.",
+                    "As provas produzidas.",
+                    "Os fundamentos de fato e de direito."
+                ],
+                correctAnswer: 3
+            },
+            {
+                question: "De acordo com o Art. 413, o juiz pronunciará o acusado:",
+                options: [
+                    "Quando estiver convencido da materialidade do fato e da existência de indícios suficientes de autoria.",
+                    "Sempre que houver dúvida sobre a autoria.",
+                    "Apenas com base na confissão do réu.",
+                    "Apenas com base em provas testemunhais."
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "Segundo o Art. 419, quando o juiz se convencer, pela prova dos autos, da existência manifesta de causa excludente da ilicitude do fato, deverá:",
+                options: [
+                    "Pronunciar o réu.",
+                    "Absolver sumariamente o acusado.",
+                    "Arquivar o processo.",
+                    "Ordenar novas diligências."
+                ],
+                correctAnswer: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('quiz').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const questionData = questions[currentQuestion];
+            document.getElementById('question').innerText = questionData.question;
+            questionData.options.forEach((option, index) => {
+                document.getElementById(`option${index}`).innerText = option;
+            });
+        }
+
+        function checkAnswer(selectedOption) {
+            const questionData = questions[currentQuestion];
+            const feedback = document.getElementById('feedback');
+            if (selectedOption === questionData.correctAnswer) {
+                feedback.innerText = 'Correto!';
+                feedback.style.color = 'green';
+                score++;
+            } else {
+                feedback.innerText = 'Errado!';
+                feedback.style.color = 'red';
+            }
+            feedback.style.display = 'block';
+            setTimeout(() => {
+                feedback.style.display = 'none';
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1000);
+        }
+
+        function showResult() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('score').innerText = `${score} de ${questions.length}`;
+        }
+
+        startQuiz();
+    </script>
+</body>
+</html>
